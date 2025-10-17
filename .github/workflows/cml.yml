@@ -1,0 +1,51 @@
+# This is a basic workflow to help you get started with Actions
+
+name: pratique CICD
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - uses: actions/checkout@v3
+      - name: cml_run
+        env:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          ACTIONS_RUNNER_FORCE_ACTIONS_NODE_VERSION: node16
+          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: 'true'
+        run: |
+          # Workflow goes here
+           
+          python main.py
+          # Write your CML report
+          echo "## Message:" >> report.md
+          cat sortie.txt >> report.md
+
+         
+          #cml-send-comment metrics.txt 
+          #cml-send-comment report.md
+          git config --global user.email "mhafod@yahoo.com"
+          git config --global user.name "degenio"
+          git add report.md sortie.txt
+          git commit -m "pousser vers github repository"
+          git push origin HEAD:main
+
